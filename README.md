@@ -5,8 +5,19 @@ Criar uma API onde seja possível criar(já está pronto) e listar(este é o des
 
 ## Como rodar o projeto
 ``` shell
+## ---------- GRPC
+make install-grpc
+make init-grpc
+
+## ---------- GRAPHQL
+make install-graphql
+make init-graphql
+make gen-graphql
+
+
+## ---------- MAIN
 ## put the docker-compose containers up
-make up 
+make up
 
 ## put the docker-compose containers down
 make down
