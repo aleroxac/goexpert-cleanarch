@@ -24,32 +24,36 @@ import (
 )
 
 func main() {
+	// ----- CONFIGS
 	configs, err := configs.LoadConfig(".")
 	if err != nil {
 		panic(err)
 	}
 
+	// ----- DATABASE
 	db, err := sql.Open(configs.DBDriver, fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", configs.DBUser, configs.DBPassword, configs.DBHost, configs.DBPort, configs.DBName))
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
 
+	// ----- RABBITMQ
 	rabbitMQChannel := getRabbitMQChannel()
-
 	eventDispatcher := events.NewEventDispatcher()
 	eventDispatcher.Register("OrderCreated", &handler.OrderCreatedHandler{
 		RabbitMQChannel: rabbitMQChannel,
 	})
-
 	createOrderUseCase := NewCreateOrderUseCase(db, eventDispatcher)
 
+	// ----- WEBSERVER
 	webserver := webserver.NewWebServer(configs.WebServerPort)
 	webOrderHandler := NewWebOrderHandler(db, eventDispatcher)
-	webserver.AddHandler("/order", webOrderHandler.Create)
+	webserver.AddHandler("POST /order", webOrderHandler.Create)
+	webserver.AddHandler("GET /orders", webOrderHandler.List)
 	fmt.Println("Starting web server on port", configs.WebServerPort)
 	go webserver.Start()
 
+	// ----- GRPC_SERVER
 	grpcServer := grpc.NewServer()
 	createOrderService := service.NewOrderService(*createOrderUseCase)
 	pb.RegisterOrderServiceServer(grpcServer, createOrderService)
@@ -62,6 +66,7 @@ func main() {
 	}
 	go grpcServer.Serve(lis)
 
+	// ----- GRAPHQL_SERVER
 	srv := graphql_handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
 		CreateOrderUseCase: *createOrderUseCase,
 	}}))
