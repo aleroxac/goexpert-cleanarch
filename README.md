@@ -5,19 +5,9 @@ Criar uma API onde seja possível criar(já está pronto) e listar(este é o des
 
 ## Como rodar o projeto
 ``` shell
-## ---------- GRPC
-make install-grpc
-make init-grpc
-
-## ---------- GRAPHQL
-make install-graphql
-make init-graphql
-make gen-graphql
-
-
-## ---------- MAIN
 ## put the docker-compose containers up
 make up
+docker exec -it mysql bash -c 'mysql -u root -D orders -proot -e "CREATE TABLE orders (id varchar(255) NOT NULL, price float NOT NULL, tax float NOT NULL, final_price float NOT NULL, PRIMARY KEY (id))"'
 
 ## put the docker-compose containers down
 make down

@@ -44,6 +44,7 @@ func main() {
 		RabbitMQChannel: rabbitMQChannel,
 	})
 	createOrderUseCase := NewCreateOrderUseCase(db, eventDispatcher)
+	listOrderUsecase := NewListOrderUseCase(db, eventDispatcher)
 
 	// ----- WEBSERVER
 	webserver := webserver.NewWebServer(configs.WebServerPort)
@@ -55,7 +56,8 @@ func main() {
 
 	// ----- GRPC_SERVER
 	grpcServer := grpc.NewServer()
-	createOrderService := service.NewOrderService(*createOrderUseCase)
+	createOrderService := service.NewOrderService(*createOrderUseCase, *listOrderUsecase)
+	// createOrderService := service.NewOrderService(*createOrderUseCase, *listOrderUseCase)
 	pb.RegisterOrderServiceServer(grpcServer, createOrderService)
 	reflection.Register(grpcServer)
 
