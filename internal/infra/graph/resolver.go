@@ -8,4 +8,5 @@ import "github.com/aleroxac/goexpert-cleanarch/internal/usecase"
 
 type Resolver struct {
 	CreateOrderUseCase usecase.CreateOrderUseCase
+	ListOrderUseCase   usecase.ListOrderUseCase
 }
