@@ -42,7 +42,7 @@ mutation createOrder {
 
 ## liste as orders
 query queryOrders {
-  orders {
+  listOrders {
     id
     Price
     Tax
