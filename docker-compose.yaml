@@ -2,6 +2,11 @@ version: '3'
 
 
 
+networks:
+  goexpert:
+
+
+
 services:
   mysql:
     hostname: mysql
@@ -14,6 +19,8 @@ services:
       MYSQL_PASSWORD: root
     ports:
       - 3306:3306
+    networks: 
+      - goexpert
     healthcheck:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
       start_period: 10s
@@ -21,11 +28,30 @@ services:
       timeout: 10s
       retries: 3
 
+  migrations:
+    hostname: migrations
+    container_name: migrations
+    restart: no
+    image: migrate/migrate:v4.17.1
+    networks: 
+      - goexpert
+    environment:
+      MYSQL_DATABASE: orders
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - ./sql/migrations:/migrations
+    command: -path=/migrations -database "mysql://root:root@tcp(mysql:3306)/orders" -verbose up
+    depends_on:
+      mysql:
+        condition: service_healthy
+
   rabbitmq:
     hostname: rabbitmq
     container_name: rabbitmq
     restart: always
     image: rabbitmq:3.12.14-management-alpine
+    networks: 
+      - goexpert
     ports:
       - 5672:5672
       - 15672:15672

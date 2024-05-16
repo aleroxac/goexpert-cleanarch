@@ -36,7 +36,7 @@
 - Um sistema pode ter diversos formatos de entrega: xml, json, protobuf, graghql, cli, etc
 ``` go
 input := CategoryInputDTO("name")
-output := CreateCategoruUseCase(input)
+output := CreateCategoryUseCase(input)
 jsonResult := CategoryPresenter(output).toJSON();
 xmlResult := CategoryPresenter(output).toXML();
 fmt.Println(jsonResult)
